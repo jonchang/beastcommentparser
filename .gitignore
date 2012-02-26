@@ -1,0 +1,16 @@
+## generic files to ignore
+*.log
+*.tmproj
+*.lock
+*.DS_Store
+*.swp
+*.out
+*.rates
+*.egg-info
+
+## python
+*.pyc
+
+## trash
+trash*
+dist
