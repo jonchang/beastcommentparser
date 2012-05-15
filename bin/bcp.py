@@ -1,24 +1,37 @@
 #!/usr/bin/env python
 
-"""bcp.py - dumps comment data from BEAST trees in a format suitable for consumption by more advanced spreadsheet programs.
-"""
+"""bcp.py - extracts comment data from BEAST summary trees"""
 
 import sys
+import argparse
+import csv
+import os.path
+import dendropy
+from beastcommentparser import BeastCommentParser
+
+
 
 def get_args():
-    import argparse
-    parser = argparse.ArgumentParser(description="extracts comment data from BEAST trees to a format suitable for consumption by more advanced spreadsheet programs.")
-    parser.add_argument('tree', metavar="FILE", help="tree file(s) to process", nargs="+")
+    parser = argparse.ArgumentParser(description="extracts comment data from" +
+        " BEAST summary trees")
+    parser.add_argument('tree', metavar="FILE", help="tree files to process",
+        nargs="+")
 
-    parser.add_argument('-o', '--output', metavar="OUTPUT", type=argparse.FileType(mode='w', bufsize=1), default=sys.stdout, help="""write output to %(metavar)s. (default: stdout)""")
-    parser.add_argument('-f', '--format', choices=["csv", "tsv"], default="tsv", help="""type of output. (default: %(default)s)""")
-    parser.add_argument('--schema', default="nexus", help="""specify schema of FILE. (default: %(default)s).""", choices=["nexus", "newick", "fasta", "phylip"])
-    parser.add_argument('--data-type', help="""required if SCHEMA is fasta or phylip.""", choices=["dna", "rna", "protein", "standard", "restriction", "infinite"])
-    parser.add_argument('-r', '--report', action="store", default="all", choices=["leaf", "internal", "all"], help="""which types of nodes to report (default: %(default)s)""")
-    parser.add_argument('-v', '--values', action="store", default="ALL", help="""comma-separated list of values to report (default: %(default)s).""") 
+    parser.add_argument('-o', '--output', help="output file")
+    parser.add_argument('--format', default="nexus", help="tree format",
+        choices=["nexus", "newick", "fasta", "phylip"])
+    parser.add_argument('--data-type', help="type of character data " +
+        "(required for fasta and phylip)", choices=("dna rna protein " +
+        "standard restriction infinite").split())
+    parser.add_argument('-r', '--report', action="store", default="all",
+        choices=["leaf", "internal", "all"], help="which types of nodes to " +
+        "extract data from")
+    parser.add_argument('-v', '--values', action="store", default="ALL",
+        help="comma-separated list of values to report (e.g., height)")
 
     args = parser.parse_args()
     return args
+
 
 class Table:
     def __init__(self):
@@ -84,12 +97,12 @@ class Table:
                     for item_value in set_values:
                         value = row[set_name + item_value + index]
                         if value:
-                            table.add(value, name, "{0}{1}={2}".format(set_name, item_value, key))
+                            table.add(value, name, "{0}{1}={2}".format(
+                                set_name, item_value, key))
         self.merge(table)
 
 
 def iterate_nodes(tree, nodes, columns, all=False, use_table=None):
-    from BeastCommentParser import BeastCommentParser
 
     if use_table:
         table = use_table
@@ -123,35 +136,34 @@ def iterate_nodes(tree, nodes, columns, all=False, use_table=None):
                         table.add(data[k], rowname, k)
     return table
 
+
 def reverse_mrca(tree, head):
-    """Returns the two farthest leaf nodes that have the provided node as a most recent common ancestor.
+    """Returns the two farthest leaf nodes that have the given node
+    as a most recent common ancestor.
     """
     nodes = list(head.leaf_iter())
     for node in nodes:
         for bnode in reversed(nodes):
             if node == bnode:
-                continue # no need to check this case
+                continue  # no need to check this case
             common = tree.mrca(taxa=[node.taxon, bnode.taxon])
             if head == common:
                 return node, bnode
 
-def main():
-    import dendropy
-    import csv
 
+def main():
     args = get_args()
 
-    all_values = False
-    if args.values == 'ALL':
-        all_values = True
+    all_values = True if args.values == 'ALL' else False
     choice = args.values.split(',')
 
     for treefile in args.tree:
-        tree = dendropy.Tree.get_from_path(treefile, args.schema)
+        tree = dendropy.Tree.get_from_path(treefile, args.format)
         taxon_set = tree.taxon_set
         # In order to "encode_splits" we need to have a prepopulated TaxonSet
         # object. It costs a little bit to parse the tree twice but that's OK.
-        tree = dendropy.Tree.get_from_path(treefile, args.schema, taxon_set=taxon_set, encode_splits=True)
+        tree = dendropy.Tree.get_from_path(treefile, args.format,
+            taxon_set=taxon_set, encode_splits=True)
         tree.ladderize()
 
         if all_values:
@@ -164,17 +176,22 @@ def main():
 
         table = Table()
         if args.report == "leaf" or args.report == "all":
-            table = iterate_nodes(tree, tree.leaf_iter(), choice, all_values, use_table=table)
+            table = iterate_nodes(tree, tree.leaf_iter(), choice,
+                all_values, use_table=table)
         if args.report == "internal" or args.report == "all":
-            table = iterate_nodes(tree, tree.internal_nodes(), choice, all_values, use_table=table)
+            table = iterate_nodes(tree, tree.internal_nodes(), choice,
+                all_values, use_table=table)
         rows = table.output()
 
-        if args.format == 'tsv':
-            writer = csv.writer(args.output, 'excel-tab')
-            writer.writerows(rows)
+        if args.output:
+            outfile = args.output
         else:
-            writer = csv.writer(args.output, 'excel')
+            root, ext = os.path.splitext(os.path.basename(treefile))
+            outfile = root + ".txt"
+        with open(outfile, "wb") as wfile:
+            writer = csv.writer(wfile, 'excel-tab')
             writer.writerows(rows)
+            print "Output written to {0}".format(outfile)
 
 if __name__ == '__main__':
     main()
