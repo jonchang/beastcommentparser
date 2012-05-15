@@ -16,22 +16,15 @@ Ensure Python 2.7 is installed::
 
     python -V
 
-Install dendropy::
+Install dendropy, using `pip <http://pypi.python.org/pypi/pip>`_::
 
     pip install dendropy
 
 Install beastcommentparser::
 
-    git clone git@github.com:jonchang/beastcommentparser.git
-
-Testing
-*******
-
-In the program's directory::
-
-    python BeastCommentParser/__init__.py -v
-
-At the bottom of all the output you should see "Test passed."
+    git clone https://jonchang@github.com/jonchang/beastcommentparser.git
+    cd beastcommentparser/
+    pip install .
 
 Usage
 *****
@@ -40,16 +33,20 @@ An example BEAST summary tree, *arctoid.tree*, is included in the examples/ dire
 
     python bcp.py examples/arctoid.tree
 
-Write to a file instead, reporting only leaf nodes::
+An output file *arctoid.txt* will be created in the current directory. It is then possible to view this in Microsoft Excel or other spreadsheet software.
 
-    python bcp.py --report=leaf --output=arctoid.txt examples/arctoid.tree
+Reporting only leaf nodes::
+
+    python bcp.py --report=leaf examples/arctoid.tree
 
 More options can be found viewing the help::
 
     python bcp.py --help
 
+Results from phylogeographic analyses are also extracted and formatted nicely, but this feature is not well-tested.
+
 See also
 ********
 
-- BEAST <http://beast.bio.ed.ac.uk/>
-- dendropy <http://packages.python.org/DendroPy>
+- `BEAST <http://beast.bio.ed.ac.uk/>`_
+- `dendropy <http://packages.python.org/DendroPy>`_
