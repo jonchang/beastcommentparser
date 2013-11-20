@@ -6,8 +6,8 @@ if __name__ == '__main__':
     setup(
         name="beastcommentparser",
         version="1.0",
-        description="extracts comment information from BEAST summary files",
-        long_description=open("README.rst").read(),
+        description="extracts and formats data from BEAST summary trees",
+        long_description=open("README.md").read(),
         author="Jonathan Chang, Michael Alfaro",
         author_email="jonathan.chang@ucla.edu",
         url="https://github.com/jonchang/beastcommentparser/",
