@@ -5,15 +5,15 @@
 # Dependencies
 
 * Python 2.7
-* dendropy <http://packages.python.org/DendroPy>
+* [DendroPy](http://packages.python.org/DendroPy)
 
 # Installation
 
 ## OS X
 
-The simplest way is to use [http://brew.sh/](Homebrew). Using Homebrew:
+The simplest way is to use [Homebrew](http://brew.sh). With Homebrew:
 
-```
+```sh
 brew install python
 pip install dendropy
 pip install -e git+https://github.com/jonchang/beastcommentparser.git#egg=beastcommentparser
@@ -28,7 +28,7 @@ bcp.py examples/arctoid.tree
 #=> Output written to arctoid.txt
 ```
 
-Running the program with only a summary tree will create a text file of the same name in the current directory. You can then view this file in a spreadsheet program or analzyze it further in R, Python, etc.
+Running the program with only a tree as the argument will create a text file of the same name in the current directory. You can then view this file in a spreadsheet program or analzyze it further in R, Python, etc.
 
 Only report on leaf nodes:
 
