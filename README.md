@@ -16,7 +16,7 @@ The simplest way is to use [Homebrew](http://brew.sh). With Homebrew:
 ```sh
 brew install python
 pip install dendropy
-pip install -e git+https://github.com/jonchang/beastcommentparser.git#egg=beastcommentparser
+pip install https://github.com/jonchang/beastcommentparser/archive/master.zip
 ```
 
 # Usage
