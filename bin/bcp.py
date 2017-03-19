@@ -158,12 +158,14 @@ def main():
     choice = args.values.split(',')
 
     for treefile in args.tree:
-        tree = dendropy.Tree.get_from_path(treefile, args.format)
-        taxon_namespace = tree.taxon_namespace
         # In order to "encode_splits" we need to have a prepopulated TaxonSet
         # object. It costs a little bit to parse the tree twice but that's OK.
+        tree = dendropy.Tree.get_from_path(treefile, args.format)
+        taxon_namespace = tree.taxon_namespace
+        # We roll our own comment metadata extraction instead of using
+        # DendroPy's since ours is superior.
         tree = dendropy.Tree.get_from_path(treefile, args.format,
-            taxon_namespace=taxon_namespace)
+            taxon_namespace=taxon_namespace, extract_comment_metadata=False)
         tree.encode_bipartitions()
         tree.ladderize()
 
