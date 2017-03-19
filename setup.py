@@ -5,7 +5,7 @@ from distutils.core import setup
 if __name__ == '__main__':
     setup(
         name="beastcommentparser",
-        version="1.0",
+        version="1.1",
         description="extracts and formats data from BEAST summary trees",
         long_description=open("README.md").read(),
         author="Jonathan Chang, Michael Alfaro",
@@ -21,7 +21,7 @@ if __name__ == '__main__':
             "Programming Language :: Python",
             "Topic :: Scientific/Engineering :: Bio-Informatics",
         ],
-        install_requires=["DendroPy >= 3.9.0"],
+        install_requires=["DendroPy >= 4.2.0"],
         scripts=["bin/bcp.py"],
         packages=["beastcommentparser"]
     )

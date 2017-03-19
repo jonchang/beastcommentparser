@@ -159,11 +159,12 @@ def main():
 
     for treefile in args.tree:
         tree = dendropy.Tree.get_from_path(treefile, args.format)
-        taxon_set = tree.taxon_set
+        taxon_namespace = tree.taxon_namespace
         # In order to "encode_splits" we need to have a prepopulated TaxonSet
         # object. It costs a little bit to parse the tree twice but that's OK.
         tree = dendropy.Tree.get_from_path(treefile, args.format,
-            taxon_set=taxon_set, encode_splits=True)
+            taxon_namespace=taxon_namespace)
+        tree.encode_bipartitions()
         tree.ladderize()
 
         if all_values:
@@ -176,7 +177,7 @@ def main():
 
         table = Table()
         if args.report == "leaf" or args.report == "all":
-            table = iterate_nodes(tree, tree.leaf_iter(), choice,
+            table = iterate_nodes(tree, tree.leaf_node_iter(), choice,
                 all_values, use_table=table)
         if args.report == "internal" or args.report == "all":
             table = iterate_nodes(tree, tree.internal_nodes(), choice,
